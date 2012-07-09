@@ -42,11 +42,10 @@ public class KeepShit extends JavaPlugin implements Listener{
 			Player player = (Player) event.getEntity();
 			List<ItemStack> list = event.getDrops();
 			int size = list.size();
-			Connection conn = DriverManager.getConnection("plugins/KeepShit/jdbc:sqlite:"+player.getName()+".db");
+			Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/KeepShit/"+player.getName()+".db");
 			conn.createStatement().execute("Create Table "+player.getName()+"(id int primary key, TypeID int, Amount int)");
 			for(int temp = 0;temp<size;temp++){
 				conn.createStatement().execute("Insert into "+player.getName()+" Values("+(temp+1)+","+list.get(temp).getTypeId()+","+list.get(temp).getAmount()+")");
-				System.out.println("Insert into "+player.getName()+" Values("+(temp+1)+","+list.get(temp).getTypeId()+","+list.get(temp).getAmount()+")");
 			}
 			event.getDrops().clear();
 
@@ -55,13 +54,11 @@ public class KeepShit extends JavaPlugin implements Listener{
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void whenSpawned(final PlayerRespawnEvent event) throws SQLException{
 		Player player = event.getPlayer();
-		Connection conn = DriverManager.getConnection("plugins/KeepShit/jdbc:sqlite:"+player.getName()+".db");
+		Connection conn = DriverManager.getConnection("jdbc:sqlite:plugins/KeepShit/"+player.getName()+".db");
 		ResultSet data = conn.createStatement().executeQuery("Select * From "+player.getName());
 		while(data.next()){
-			int id = data.getInt("id");
 			int TypeID = data.getInt("TypeID");
 			int Amount = data.getInt("Amount");
-			System.out.println(id+" "+TypeID+" "+Amount);
 			player.getInventory().addItem(new ItemStack(TypeID,Amount));
 		}
 		conn.createStatement().execute("Drop Table "+player.getName());
